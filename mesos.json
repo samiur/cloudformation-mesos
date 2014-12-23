@@ -107,6 +107,11 @@
       "Type" : "String",
       "Default" : "in-memory://localhost/?max_length=100"
     },
+    "ChronosDockerImage" : {
+      "Description" : "The Chronos Docker image (format: 'registry:port/repository:version')",
+      "Type" : "String",
+      "Default" : "samiur/chronos:latest"
+    },
 
     "MesosMasterTemplateUrl" : {
       "Description" : "URL of the Mesos Master CloudFormation template on S3 (must be \"https://s3.amazonaws.com/<bucket>/<key>\")",
