@@ -59,6 +59,11 @@
       "Type" : "String",
       "Default" : "in-memory://localhost/?max_length=100"
     },
+    "ChronosDockerImage" : {
+      "Description" : "The Chronos Docker image (format: 'registry:port/repository:version')",
+      "Type" : "String",
+      "Default" : "samiur/chronos:latest"
+    },
     "DockerCredentials" : {
       "Description" : "JSON string to be saved as .dockercfg",
       "Type" : "String",
@@ -276,6 +281,17 @@
           "     --event-store ", { "Ref": "MarathonLoggerEventStore" }, "'\n",
           "runit-service enable marathon-logger\n",
 
+          "# Set up and start Chronos \n",
+          "export HOME=/root/  # so Docker can find ~/.dockercfg\n",
+          "docker pull ", { "Ref": "ChronosDockerImage" }, "\n",
+          "runit-service create chronos 'docker -r=false run ",
+          "   --net=host",
+          "   -p 8081:8081",
+          "   ", { "Ref": "ChronosDockerImage" },
+          "     --master zk://`zk-list-nodes`/", { "Ref": "ClusterId" },
+          "     --zk_hosts zk://`zk-list-nodes`/", { "Ref": "ClusterId" }, "_chronos",
+          "     --http-port 8081\n",
+
           "# All is well so signal success\n",
           "cfn-signal -e 0 -r \"Stack setup complete\" '", { "Ref" : "WaitHandle" }, "'\n",
 
@@ -287,7 +303,7 @@
     "SecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
-        "GroupDescription" : "Enable SSH, Mesos, and Marathon access",
+        "GroupDescription" : "Enable SSH, Mesos, Marathon and Chronos access",
         "VpcId" : { "Ref" : "VpcId" }
       }
     },
